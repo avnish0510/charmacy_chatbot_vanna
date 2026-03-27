@@ -41,7 +41,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import pandas as pd
 import streamlit as st
@@ -54,6 +54,9 @@ if str(ROOT) not in sys.path:
 # ── Core ────────────────────────────────────────────────────────────────────
 from core.vanna_instance import get_vanna, MyVanna
 from core.sql_validator import validate_sql, ValidationResult
+
+if TYPE_CHECKING:
+    from persistence.sqlite_store import SQLiteStore
 
 try:
     # from core.error_recovery import error_recovery as _error_recovery
@@ -75,25 +78,17 @@ from streamlit_app.components.sql_viewer import render_sql_viewer
 from streamlit_app.components.data_table import render_data_table
 from streamlit_app.components.kpi_card import render_kpi_card
 
-# ── Persistence (graceful — app works without it) ───────────────────────────
-# try:
-#     from persistence.sqlite_store import get_sqlite_store, SQLiteStore
-#     _HAS_PERSISTENCE = True
-# except ImportError:
-#     _HAS_PERSISTENCE = False
-#     SQLiteStore = None          # type: ignore[assignment,misc]
-
-#     def get_sqlite_store(**_):  # type: ignore[misc]
-#         return None
 try:
     from persistence.sqlite_store import get_sqlite_store, SQLiteStore
     _HAS_PERSISTENCE = True
+    print("+++++++++++++++++++++++++++++")
+
 except ImportError as e:
     import traceback
-    print("==========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================")
     traceback.print_exc()   # prints the full chain including root cause
     _HAS_PERSISTENCE = False
-    SQLiteStore = None
+    print("[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
+    # SQLiteStore = None
     def get_sqlite_store(**_):
         return None
 # ── Feedback (graceful — app works without it) ──────────────────────────────
@@ -355,230 +350,6 @@ def _render_sidebar(vn: MyVanna, store: Optional[SQLiteStore]) -> None:
         st.caption("Vanna AI · Ollama qwen3:9b · Streamlit")
 
 
-# ═════════════════════════════════════════════════════════════════════════════
-# QUERY PIPELINE
-# ═════════════════════════════════════════════════════════════════════════════
-
-# def _run_query_pipeline(
-#     vn: MyVanna,
-#     question: str,
-#     store: Optional[SQLiteStore],
-# ) -> None:
-#     """
-#     Execute the full 11-step text-to-SQL → chart pipeline.
-
-#     All rendering is delegated to component modules.
-#     All persistence is delegated to sqlite_store / feedback_collector.
-#     """
-#     query_id = str(uuid.uuid4())
-#     st.session_state["last_query_id"] = query_id
-#     st.session_state["last_question"] = question
-
-#     pipeline_start = time.perf_counter()
-#     retries_used = 0
-#     chart_type = ""
-#     error_message = ""
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 1. PREPROCESS
-#     # ══════════════════════════════════════════════════════════════════════
-#     chart_hint = _extract_chart_hint(question)
-#     clean_question = _clean_question_for_sql(question)
-#     if chart_hint:
-#         logger.info("Chart hint: '%s'", chart_hint)
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 2. GENERATE SQL
-#     # ══════════════════════════════════════════════════════════════════════
-#     gen_start = time.perf_counter()
-#     with st.spinner("🧠 Generating SQL…"):
-#         try:
-#             sql = vn.generate_sql(question=clean_question)
-#         except Exception as exc:
-#             error_message = f"SQL generation failed: {exc}"
-#             st.error(f"❌ {error_message}")
-#             logger.error(error_message, exc_info=True)
-#             _log_query(store, query_id, question, "", False, error_message)
-#             return
-#     gen_time = time.perf_counter() - gen_start
-
-#     if not sql or not sql.strip():
-#         error_message = "Model returned empty SQL."
-#         st.error("❌ The model returned an empty SQL query. Please rephrase.")
-#         _log_query(store, query_id, question, "", False, error_message)
-#         return
-
-#     st.session_state["last_sql"] = sql
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 3. VALIDATE SQL
-#     # ══════════════════════════════════════════════════════════════════════
-#     val_result: ValidationResult = validate_sql(sql)
-
-#     # ── Security violation → hard stop ───────────────────────────────────
-#     if val_result.is_security_violation:
-#         st.error("🚫 **Security violation** — this query was blocked.")
-#         for v in val_result.violations:
-#             st.warning(v)
-#         error_message = val_result.violation_summary()
-#         logger.warning("SECURITY | query_id=%s | %s", query_id, error_message)
-#         _log_query(store, query_id, question, sql, False, error_message)
-#         return
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 4. ERROR RECOVERY (sanity violations)
-#     # ══════════════════════════════════════════════════════════════════════
-#     df: Optional[pd.DataFrame] = None
-
-#     if val_result.is_sanity_violation:
-#         st.warning("⚠️ SQL had issues — auto-correcting…")
-#         sql, df, retries_used, error_message = _attempt_recovery(
-#             vn, clean_question, sql, val_result.violations,
-#         )
-#         if sql is None:
-#             _log_query(store, query_id, question, st.session_state.get("last_sql", ""),
-#                        False, error_message, retries=retries_used)
-#             return
-#         st.session_state["last_sql"] = sql
-#     else:
-#         sql = val_result.fixed_sql
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 5. EXECUTE SQL
-#     # ══════════════════════════════════════════════════════════════════════
-#     exec_start = time.perf_counter()
-#     if df is None:
-#         with st.spinner("⚡ Running query…"):
-#             try:
-#                 df = vn.run_sql(sql)
-#             except Exception as exc:
-#                 st.warning("⚠️ Execution failed — attempting recovery…")
-#                 sql, df, retries_used, error_message = _attempt_recovery(
-#                     vn, clean_question, sql, [str(exc)],
-#                 )
-#                 if sql is None:
-#                     _log_query(store, query_id, question,
-#                                st.session_state.get("last_sql", ""),
-#                                False, error_message, retries=retries_used)
-#                     return
-#                 st.session_state["last_sql"] = sql
-#     exec_time = time.perf_counter() - exec_start
-
-#     # Cap rows per spec
-#     if df is not None:
-#         df = df.head(10_000)
-#     st.session_state["last_df"] = df
-
-#     rows_returned = len(df) if df is not None else 0
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 6. SHOW SQL (collapsible viewer)
-#     # ══════════════════════════════════════════════════════════════════════
-#     render_sql_viewer(
-#         sql=sql,
-#         original_sql=val_result.original_sql if val_result.auto_fixed else None,
-#         auto_fixed=val_result.auto_fixed,
-#     )
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 7. EDGE CASE HANDLING
-#     # ══════════════════════════════════════════════════════════════════════
-#     edge: EdgeCaseResult = handle_edge_cases(df, sql)
-
-#     if edge.warning_message:
-#         st.info(edge.warning_message)
-
-#     if edge.should_stop:
-#         _log_query(store, query_id, question, sql, True, "",
-#                    rows_returned=0, chart_type="none",
-#                    exec_ms=int((time.perf_counter() - pipeline_start) * 1000),
-#                    retries=retries_used)
-#         return
-
-#     working_df = edge.df if edge.df is not None else df
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 8. CHART PIPELINE (analyse → select → generate → annotate)
-#     # ══════════════════════════════════════════════════════════════════════
-#     if edge.force_chart_type:
-#         chart_type = edge.force_chart_type
-#         shape = analyze_data_shape(working_df, question)
-#     else:
-#         shape = analyze_data_shape(working_df, question)
-#         chart_type = select_chart_type(shape, chart_hint=chart_hint)
-
-#     st.session_state["last_chart_type"] = chart_type
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 9 & 10. RENDER
-#     # ══════════════════════════════════════════════════════════════════════
-#     if chart_type == "kpi_card":
-#         render_kpi_card(working_df, edge_result=edge)
-
-#     elif chart_type == "table":
-#         render_data_table(working_df, title="Query Results")
-
-#     else:
-#         # Generate Vega-Lite spec
-#         spec = generate_chart_spec(working_df, shape, chart_type)
-
-#         # Determine primary columns for annotation
-#         num_col = shape.numeric_cols[0] if shape.numeric_cols else None
-#         label_col = (
-#             shape.categorical_cols[0] if shape.categorical_cols
-#             else shape.temporal_col
-#         )
-
-#         # Insight annotations (max/min lines, trend detection)
-#         spec, insights = annotate_insights(
-#             spec, working_df, chart_type,
-#             numeric_col=num_col, label_col=label_col,
-#         )
-
-#         st.session_state["last_chart_spec"] = spec
-
-#         # Render the chart via vega-embed component
-#         render_chart(spec, chart_type=chart_type)
-
-#         # Insight summary caption
-#         if insights.summary_text:
-#             st.caption(f"💡 {insights.summary_text}")
-
-#         # Data table below chart (collapsed)
-#         with st.expander("📊 View Data", expanded=False):
-#             render_data_table(
-#                 working_df, title="", show_download=True, compact=True,
-#             )
-
-#     # ── Timing / meta caption ────────────────────────────────────────────
-#     total_ms = int((time.perf_counter() - pipeline_start) * 1000)
-#     meta_parts = []
-#     if gen_time:
-#         meta_parts.append(f"SQL in {gen_time:.1f}s")
-#     if exec_time:
-#         meta_parts.append(f"executed in {exec_time:.1f}s")
-#     meta_parts.append(f"{rows_returned:,} rows")
-#     if chart_type:
-#         meta_parts.append(chart_type.replace("_", " "))
-#     st.caption(f"⚡ {' · '.join(meta_parts)}")
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 6 (deferred). LOG QUERY TO SQLITE
-#     # ══════════════════════════════════════════════════════════════════════
-#     _log_query(
-#         store, query_id, question, sql, True, "",
-#         rows_returned=rows_returned,
-#         exec_ms=total_ms,
-#         chart_type=chart_type,
-#         retries=retries_used,
-#     )
-
-#     # ══════════════════════════════════════════════════════════════════════
-#     # 11. FEEDBACK
-#     # ══════════════════════════════════════════════════════════════════════
-#     _render_feedback_section(vn, question, sql, query_id, store)
-
-
 def _run_query_pipeline(
     vn: MyVanna,
     question: str,
@@ -768,51 +539,6 @@ def _run_query_pipeline(
     # 11. FEEDBACK
     # ══════════════════════════════════════════════════════════════════════
     _render_feedback_section(vn, question, sql, query_id, store)
-
-# ═════════════════════════════════════════════════════════════════════════════
-# ERROR RECOVERY WRAPPER
-# ═════════════════════════════════════════════════════════════════════════════
-
-# def _attempt_recovery(
-#     vn: MyVanna,
-#     question: str,
-#     failed_sql: str,
-#     errors: list[str],
-# ) -> tuple[Optional[str], Optional[pd.DataFrame], int, str]:
-#     """
-#     Attempt error recovery.  Returns (sql, df, retries, error_message).
-#     On total failure, sql is None and error_message describes the problem.
-#     """
-#     if _error_recovery is None:
-#         # error_recovery module not available — show failure directly
-#         st.error("❌ Error recovery module not available.")
-#         _show_failure_ui(failed_sql, errors)
-#         return None, None, 0, "error_recovery module not available"
-
-#     try:
-#         sql, df = _error_recovery(
-#             vn=vn,
-#             question=question,
-#             initial_sql=failed_sql,
-#             initial_errors=errors,
-#             max_retries=2,
-#         )
-#         return sql, df, 1, ""
-#     except Exception as exc:
-#         error_msg = str(exc)
-#         st.error(f"❌ All recovery attempts failed.")
-#         _show_failure_ui(failed_sql, errors + [error_msg])
-#         return None, None, 2, error_msg
-
-
-# def _show_failure_ui(sql: str, errors: list[str]) -> None:
-#     """Display failed SQL and accumulated error messages."""
-#     st.error("❌ Could not produce a valid query after all retries.")
-#     with st.expander("Failed SQL", expanded=True):
-#         st.code(sql, language="sql")
-#     for err in errors:
-#         st.warning(err)
-
 
 # ═════════════════════════════════════════════════════════════════════════════
 # SQLITE LOGGING HELPER
