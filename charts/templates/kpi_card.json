@@ -1,0 +1,49 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "KPI card — large centered value with subtitle label",
+  "width": 300,
+  "height": 140,
+  "padding": {"left": 20, "right": 20, "top": 24, "bottom": 24},
+  "data": {
+    "values": [
+      {"label": "__KPI_LABEL__", "value": "__KPI_VALUE__"}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "text",
+        "fontSize": 46,
+        "fontWeight": "bold",
+        "color": "#1a1a2e",
+        "font": "Inter, Segoe UI, Roboto, sans-serif",
+        "baseline": "middle",
+        "align": "center"
+      },
+      "encoding": {
+        "text": {"field": "value", "type": "nominal"}
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "fontSize": 13,
+        "fontWeight": 500,
+        "color": "#9ca3af",
+        "dy": 38,
+        "font": "Inter, Segoe UI, Roboto, sans-serif",
+        "baseline": "middle",
+        "align": "center",
+        "fontStyle": "normal"
+      },
+      "encoding": {
+        "text": {"field": "label", "type": "nominal"}
+      }
+    }
+  ],
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"}
+  }
+}

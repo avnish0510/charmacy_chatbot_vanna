@@ -1,0 +1,16 @@
+# config/database.yaml
+# SQL Server (SSMS) connection configuration.
+# Sensitive values (server, user, password) should be set via .env
+# environment variables: DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE.
+# Values here serve as fallback defaults only.
+
+server: ""            # Override with DB_SERVER env var
+database: "Charmacy_f_automate"
+user: ""              # Override with DB_USER env var
+password: ""          # Override with DB_PASSWORD env var
+driver: "ODBC Driver 17 for SQL Server"
+extra_params: "TrustServerCertificate=yes"
+
+# Query execution settings
+query_timeout_seconds: 30
+max_result_rows: 10000

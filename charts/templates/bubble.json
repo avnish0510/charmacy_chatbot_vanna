@@ -1,0 +1,100 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Bubble chart — size-encoded third dimension, no axis lines",
+  "width": 620,
+  "height": 420,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "point",
+    "filled": true,
+    "opacity": 0.6,
+    "strokeWidth": 1.5,
+    "stroke": "#ffffff",
+    "cursor": "pointer"
+  },
+  "encoding": {
+    "x": {
+      "field": "__NUMERIC_X__",
+      "type": "quantitative",
+      "title": "__NUMERIC_X_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.6,
+        "gridDash": [3, 3]
+      }
+    },
+    "y": {
+      "field": "__NUMERIC_Y__",
+      "type": "quantitative",
+      "title": "__NUMERIC_Y_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.6,
+        "gridDash": [3, 3]
+      }
+    },
+    "size": {
+      "field": "__NUMERIC_SIZE__",
+      "type": "quantitative",
+      "title": "__NUMERIC_SIZE_TITLE__",
+      "scale": {"range": [40, 800]},
+      "legend": {
+        "orient": "right",
+        "labelFontSize": 10,
+        "titleFontSize": 11,
+        "offset": 10
+      }
+    },
+    "color": {
+      "field": "__CATEGORICAL__",
+      "type": "nominal",
+      "scale": {
+        "range": [
+          "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+          "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal",
+        "columns": 4,
+        "labelFontSize": 11,
+        "symbolSize": 100,
+        "offset": 12
+      }
+    },
+    "tooltip": [
+      {"field": "__NUMERIC_X__", "type": "quantitative", "format": ",.2f"},
+      {"field": "__NUMERIC_Y__", "type": "quantitative", "format": ",.2f"},
+      {"field": "__NUMERIC_SIZE__", "type": "quantitative", "format": ",.2f"},
+      {"field": "__CATEGORICAL__", "type": "nominal"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

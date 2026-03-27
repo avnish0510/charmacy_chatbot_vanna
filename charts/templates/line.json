@@ -1,0 +1,78 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Line chart — smooth interpolation, soft dots, no axis lines",
+  "width": 640,
+  "height": 380,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "line",
+    "interpolate": "monotone",
+    "strokeWidth": 2.8,
+    "opacity": 1,
+    "point": {
+      "filled": true,
+      "size": 50,
+      "strokeWidth": 2,
+      "stroke": "#ffffff",
+      "opacity": 1
+    }
+  },
+  "encoding": {
+    "x": {
+      "field": "__TEMPORAL__",
+      "type": "__TEMPORAL_TYPE__",
+      "title": "__TEMPORAL_TITLE__",
+      "axis": {
+        "labelAngle": -30,
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "color": {
+      "value": "#6366f1"
+    },
+    "tooltip": [
+      {"field": "__TEMPORAL__", "type": "__TEMPORAL_TYPE__", "title": "__TEMPORAL_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

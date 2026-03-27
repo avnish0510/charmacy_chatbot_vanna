@@ -1,0 +1,126 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Charmacy Milano — Vega-Lite chart theme",
+  "config": {
+    "background": "#FFFFFF",
+    "font": "Inter, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif",
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 12,
+      "subtitleFontSize": 12,
+      "subtitleColor": "#6b7280"
+    },
+    "axis": {
+      "labelFontSize": 11,
+      "labelColor": "#4b5563",
+      "titleFontSize": 12,
+      "titleColor": "#374151",
+      "titleFontWeight": 500,
+      "titlePadding": 10,
+      "gridColor": "#e5e7eb",
+      "gridOpacity": 0.6,
+      "domainColor": "#9ca3af",
+      "tickColor": "#d1d5db",
+      "labelLimit": 140,
+      "labelOverlap": "parity"
+    },
+    "axisX": {
+      "labelAngle": -30
+    },
+    "legend": {
+      "labelFontSize": 11,
+      "titleFontSize": 12,
+      "titleColor": "#374151",
+      "labelColor": "#4b5563",
+      "symbolSize": 100,
+      "orient": "bottom",
+      "direction": "horizontal",
+      "columns": 4,
+      "offset": 8
+    },
+    "view": {
+      "stroke": "transparent",
+      "continuousWidth": 600,
+      "continuousHeight": 380
+    },
+    "mark": {
+      "tooltip": true
+    },
+    "bar": {
+      "cornerRadiusTopLeft": 4,
+      "cornerRadiusTopRight": 4,
+      "opacity": 0.9,
+      "stroke": "#FFFFFF",
+      "strokeWidth": 0.5
+    },
+    "line": {
+      "strokeWidth": 2.5,
+      "point": {
+        "filled": true,
+        "size": 40
+      }
+    },
+    "area": {
+      "opacity": 0.35,
+      "line": true
+    },
+    "arc": {
+      "innerRadius": 55,
+      "outerRadius": 130,
+      "stroke": "#FFFFFF",
+      "strokeWidth": 2
+    },
+    "point": {
+      "filled": true,
+      "size": 60,
+      "opacity": 0.8
+    },
+    "text": {
+      "fontSize": 11,
+      "color": "#374151"
+    },
+    "range": {
+      "category": [
+        "#6366f1",
+        "#f59e0b",
+        "#10b981",
+        "#ef4444",
+        "#8b5cf6",
+        "#ec4899",
+        "#06b6d4",
+        "#f97316",
+        "#14b8a6",
+        "#a855f7",
+        "#eab308",
+        "#64748b"
+      ],
+      "diverging": [
+        "#ef4444",
+        "#fbbf24",
+        "#fef3c7",
+        "#d1fae5",
+        "#6ee7b7",
+        "#10b981"
+      ],
+      "heatmap": [
+        "#f0f9ff",
+        "#bae6fd",
+        "#7dd3fc",
+        "#38bdf8",
+        "#0ea5e9",
+        "#0284c7",
+        "#0369a1"
+      ]
+    },
+    "numberFormat": ",.2f",
+    "padding": {
+      "left": 16,
+      "right": 16,
+      "top": 12,
+      "bottom": 12
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Histogram — rounded top corners, soft grid, no axis lines",
+  "width": 600,
+  "height": 380,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopLeft": 4,
+    "cornerRadiusTopRight": 4,
+    "opacity": 0.88,
+    "color": "#6366f1",
+    "cursor": "pointer"
+  },
+  "encoding": {
+    "x": {
+      "bin": {"maxbins": 20},
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "y": {
+      "aggregate": "count",
+      "type": "quantitative",
+      "title": "Count",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3]
+      }
+    },
+    "tooltip": [
+      {"bin": true, "field": "__NUMERIC__", "type": "quantitative", "title": "__NUMERIC_TITLE__"},
+      {"aggregate": "count", "type": "quantitative", "title": "Count"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Area chart — gradient fill, smooth curve, no axis lines",
+  "width": 640,
+  "height": 380,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "area",
+    "interpolate": "monotone",
+    "line": {
+      "strokeWidth": 2.8,
+      "color": "#6366f1"
+    },
+    "opacity": 0.18,
+    "color": {
+      "x1": 1,
+      "y1": 1,
+      "x2": 1,
+      "y2": 0,
+      "gradient": "linear",
+      "stops": [
+        {"offset": 0, "color": "#ffffff"},
+        {"offset": 1, "color": "#6366f1"}
+      ]
+    },
+    "point": {
+      "filled": true,
+      "size": 44,
+      "color": "#6366f1",
+      "strokeWidth": 2,
+      "stroke": "#ffffff"
+    }
+  },
+  "encoding": {
+    "x": {
+      "field": "__TEMPORAL__",
+      "type": "__TEMPORAL_TYPE__",
+      "title": "__TEMPORAL_TITLE__",
+      "axis": {
+        "labelAngle": -30,
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "tooltip": [
+      {"field": "__TEMPORAL__", "type": "__TEMPORAL_TYPE__", "title": "__TEMPORAL_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

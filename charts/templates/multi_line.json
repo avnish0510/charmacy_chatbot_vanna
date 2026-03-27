@@ -1,0 +1,96 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Multi-line chart — colour-coded series, smooth curves, no axis lines",
+  "width": 660,
+  "height": 400,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "line",
+    "interpolate": "monotone",
+    "strokeWidth": 2.5,
+    "point": {
+      "filled": true,
+      "size": 44,
+      "strokeWidth": 2,
+      "stroke": "#ffffff"
+    }
+  },
+  "encoding": {
+    "x": {
+      "field": "__TEMPORAL__",
+      "type": "__TEMPORAL_TYPE__",
+      "title": "__TEMPORAL_TITLE__",
+      "axis": {
+        "labelAngle": -30,
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "color": {
+      "field": "__COLOR_FIELD__",
+      "type": "nominal",
+      "scale": {
+        "range": [
+          "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+          "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal",
+        "columns": 4,
+        "labelFontSize": 11,
+        "labelColor": "#4b5563",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "symbolSize": 100,
+        "symbolStrokeWidth": 0,
+        "offset": 12
+      }
+    },
+    "tooltip": [
+      {"field": "__TEMPORAL__", "type": "__TEMPORAL_TYPE__"},
+      {"field": "__COLOR_FIELD__", "type": "nominal"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

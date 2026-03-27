@@ -1,0 +1,209 @@
+# config/rules.yaml
+# Chart type selection rules.
+#
+# Each rule is evaluated in order. The FIRST matching rule wins.
+# Conditions are ANDed. Threshold values are configurable here
+# so nothing is hardcoded in Python.
+#
+# Field reference for conditions:
+#   n_rows              : int — number of rows in the DataFrame
+#   n_cols              : int — number of columns
+#   n_numeric           : int — count of numeric columns
+#   n_temporal          : int — count of temporal (date/datetime) columns
+#   n_categorical       : int — count of categorical (string/object) columns
+#   n_boolean           : int — count of boolean columns
+#   n_categories        : int — distinct values in the primary categorical column
+#   data_pattern        : str — detected pattern (see data_shape_analyzer.py)
+#                         values: single_value, time_series, ranking,
+#                                 comparison, distribution, part_of_whole,
+#                                 correlation, matrix, geo, general
+#   chart_hint          : str — user-requested chart type extracted from question
+#                         (empty string if none)
+
+# ── Thresholds ────────────────────────────────────────────────────────────
+thresholds:
+  max_pie_slices: 8
+  max_bar_categories: 12
+  max_line_series: 6
+  large_dataset_rows: 5000
+  pre_aggregate_top_n: 30
+  kpi_max_cells: 1          # 1 row × 1 col → KPI card
+
+# ── Rules (evaluated top-to-bottom, first match wins) ─────────────────────
+rules:
+
+  # ── Single value → KPI card ───────────────────────────────────────────
+  - name: "single_value_kpi"
+    conditions:
+      n_rows: 1
+      n_cols: 1
+      n_numeric: 1
+    chart_type: "kpi_card"
+    description: "Single numeric cell → KPI card"
+
+  # ── 1 row, multiple numeric cols → KPI card (multi-metric) ────────────
+  - name: "single_row_multi_metric"
+    conditions:
+      n_rows: 1
+      n_numeric_min: 1
+    chart_type: "kpi_card"
+    description: "Single row with one or more numeric columns → KPI card"
+
+  # ── Time series: 1 temporal + 1 numeric → line ────────────────────────
+  - name: "time_series_single"
+    conditions:
+      n_temporal: 1
+      n_numeric: 1
+      n_categorical: 0
+    chart_type: "line"
+    description: "One date column + one measure → line chart"
+
+  # ── Time series: 1 temporal + 2+ numeric → multi-line ─────────────────
+  - name: "time_series_multi_measure"
+    conditions:
+      n_temporal: 1
+      n_numeric_min: 2
+      n_categorical: 0
+    chart_type: "multi_line"
+    description: "One date column + multiple measures → multi-line chart"
+
+  # ── Time series with grouping: 1 temporal + 1 cat + 1 numeric → multi_line
+  - name: "time_series_grouped"
+    conditions:
+      n_temporal: 1
+      n_categorical: 1
+      n_numeric: 1
+    chart_type: "multi_line"
+    description: "Date + category + measure → multi-line (color by category)"
+
+  # ── Categorical + numeric (few categories) → vertical bar ─────────────
+  - name: "bar_few_categories"
+    conditions:
+      n_temporal: 0
+      n_categorical: 1
+      n_numeric: 1
+      n_categories_max: 12
+    chart_type: "bar_vertical"
+    description: "One category (≤12 values) + one measure → vertical bar"
+
+  # ── Categorical + numeric (many categories) → horizontal bar ──────────
+  - name: "bar_many_categories"
+    conditions:
+      n_temporal: 0
+      n_categorical: 1
+      n_numeric: 1
+      n_categories_min: 13
+    chart_type: "bar_horizontal"
+    description: "One category (>12 values) + one measure → horizontal bar"
+
+  # ── Part-of-whole (small category set) → donut ────────────────────────
+  - name: "part_of_whole_donut"
+    conditions:
+      data_pattern: "part_of_whole"
+      n_categories_max: 8
+    chart_type: "donut"
+    description: "Part-of-whole with ≤8 slices → donut chart"
+
+  # ── Part-of-whole (too many slices) → bar ─────────────────────────────
+  - name: "part_of_whole_bar"
+    conditions:
+      data_pattern: "part_of_whole"
+      n_categories_min: 9
+    chart_type: "bar_horizontal"
+    description: "Part-of-whole with >8 slices → horizontal bar"
+
+  # ── 2 numeric → scatter ──────────────────────────────────────────────
+  - name: "two_numeric_scatter"
+    conditions:
+      n_temporal: 0
+      n_categorical: 0
+      n_numeric: 2
+    chart_type: "scatter"
+    description: "Two numeric columns only → scatter plot"
+
+  # ── 3 numeric (one as size) → bubble ─────────────────────────────────
+  - name: "three_numeric_bubble"
+    conditions:
+      n_temporal: 0
+      n_numeric: 3
+    chart_type: "bubble"
+    description: "Three numeric columns → bubble chart (third as size)"
+
+  # ── 2 categorical + 1 numeric → heatmap ──────────────────────────────
+  - name: "matrix_heatmap"
+    conditions:
+      n_categorical: 2
+      n_numeric: 1
+      data_pattern: "matrix"
+    chart_type: "heatmap"
+    description: "Two categories + one measure with matrix pattern → heatmap"
+
+  # ── 2 categorical + 1 numeric (non-matrix) → grouped bar ─────────────
+  - name: "two_cat_grouped_bar"
+    conditions:
+      n_categorical: 2
+      n_numeric: 1
+    chart_type: "grouped_bar"
+    description: "Two categories + one measure → grouped bar chart"
+
+  # ── Distribution (single numeric, many rows) → histogram ─────────────
+  - name: "distribution_histogram"
+    conditions:
+      data_pattern: "distribution"
+      n_numeric: 1
+    chart_type: "histogram"
+    description: "Single numeric distribution → histogram"
+
+  # ── 1 temporal + 1 numeric → area (only if data_pattern is time_series
+  #    and chart_hint says area) ─────────────────────────────────────────
+  - name: "area_chart"
+    conditions:
+      data_pattern: "time_series"
+      chart_hint: "area"
+    chart_type: "area"
+    description: "Time series with area hint → area chart"
+
+  # ── Diverging comparison → diverging bar ──────────────────────────────
+  - name: "diverging_bar"
+    conditions:
+      data_pattern: "comparison"
+      chart_hint: "diverging"
+    chart_type: "diverging_bar"
+    description: "Comparison data with diverging hint → diverging bar"
+
+  # ── Fallback → table ─────────────────────────────────────────────────
+  - name: "fallback_table"
+    conditions: {}
+    chart_type: "table"
+    description: "No matching rule → render as data table"
+
+# ── Chart-hint aliases ────────────────────────────────────────────────────
+# Maps user phrases to canonical chart_type names.
+chart_hint_aliases:
+  "bar": "bar_vertical"
+  "bar chart": "bar_vertical"
+  "vertical bar": "bar_vertical"
+  "horizontal bar": "bar_horizontal"
+  "line": "line"
+  "line chart": "line"
+  "trend": "line"
+  "multi-line": "multi_line"
+  "area": "area"
+  "area chart": "area"
+  "pie": "donut"
+  "pie chart": "donut"
+  "donut": "donut"
+  "donut chart": "donut"
+  "scatter": "scatter"
+  "scatter plot": "scatter"
+  "bubble": "bubble"
+  "bubble chart": "bubble"
+  "heatmap": "heatmap"
+  "heat map": "heatmap"
+  "histogram": "histogram"
+  "grouped bar": "grouped_bar"
+  "stacked bar": "grouped_bar"
+  "kpi": "kpi_card"
+  "card": "kpi_card"
+  "table": "table"
+  "data table": "table"

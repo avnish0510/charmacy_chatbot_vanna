@@ -1,0 +1,82 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Vertical bar chart — rounded top corners, no axis lines",
+  "width": 600,
+  "height": 380,
+  "padding": {"left": 16, "right": 16, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopLeft": 6,
+    "cornerRadiusTopRight": 6,
+    "opacity": 0.92,
+    "cursor": "pointer"
+  },
+  "encoding": {
+    "x": {
+      "field": "__CATEGORICAL__",
+      "type": "nominal",
+      "sort": "-y",
+      "axis": {
+        "labelAngle": -30,
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "labelLimit": 120,
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "color": {
+      "field": "__CATEGORICAL__",
+      "type": "nominal",
+      "scale": {
+        "range": [
+          "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+          "#8b5cf6", "#ec4899", "#06b6d4", "#f97316",
+          "#14b8a6", "#a855f7", "#eab308", "#64748b"
+        ]
+      },
+      "legend": null
+    },
+    "tooltip": [
+      {"field": "__CATEGORICAL__", "type": "nominal", "title": "__CATEGORICAL_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

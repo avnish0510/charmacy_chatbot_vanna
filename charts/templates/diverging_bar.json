@@ -1,0 +1,89 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Diverging bar — positive/negative colour, rounded ends, no axis lines",
+  "width": 600,
+  "height": "__DYNAMIC_HEIGHT__",
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopRight": 5,
+    "cornerRadiusBottomRight": 5,
+    "cornerRadiusTopLeft": 5,
+    "cornerRadiusBottomLeft": 5,
+    "opacity": 0.88,
+    "height": {"band": 0.7},
+    "cursor": "pointer"
+  },
+  "encoding": {
+    "y": {
+      "field": "__CATEGORICAL__",
+      "type": "nominal",
+      "sort": "-x",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#374151",
+        "labelLimit": 200,
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "x": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "color": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "scale": {
+        "domainMid": 0,
+        "range": ["#ef4444", "#fde68a", "#6ee7b7", "#10b981"]
+      },
+      "legend": {
+        "orient": "bottom",
+        "gradientLength": 200,
+        "gradientThickness": 12,
+        "labelFontSize": 10,
+        "titleFontSize": 11,
+        "offset": 12,
+        "title": "__NUMERIC_TITLE__"
+      }
+    },
+    "tooltip": [
+      {"field": "__CATEGORICAL__", "type": "nominal", "title": "__CATEGORICAL_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

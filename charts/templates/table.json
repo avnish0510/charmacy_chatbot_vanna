@@ -1,0 +1,30 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Table placeholder — actual rendering uses st.dataframe() in Streamlit",
+  "_chart_type": "table",
+  "_message": "This template is a reference placeholder. Tables are rendered via Streamlit st.dataframe() with use_container_width=True. The data is passed directly as a pandas DataFrame.",
+  "_styling_notes": {
+    "streamlit_config": {
+      "use_container_width": true,
+      "hide_index": true,
+      "column_config_notes": "Use st.column_config for formatting numeric cols with commas, date cols with format strings, etc."
+    },
+    "recommended_css": {
+      "header_bg": "#f8fafc",
+      "header_color": "#1a1a2e",
+      "header_font_weight": 600,
+      "row_hover_bg": "#f1f5f9",
+      "border_color": "#e2e8f0",
+      "font_family": "Inter, Segoe UI, Roboto, sans-serif",
+      "font_size": "13px"
+    }
+  },
+  "data": {"values": "__DATA__"},
+  "mark": {"type": "text"},
+  "encoding": {},
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"}
+  }
+}

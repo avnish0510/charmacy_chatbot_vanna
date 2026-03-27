@@ -1,0 +1,98 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Grouped bar chart — rounded tops, no axis lines, bottom legend",
+  "width": 640,
+  "height": 400,
+  "padding": {"left": 16, "right": 24, "top": 20, "bottom": 12},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "bar",
+    "cornerRadiusTopLeft": 5,
+    "cornerRadiusTopRight": 5,
+    "opacity": 0.9,
+    "cursor": "pointer"
+  },
+  "encoding": {
+    "x": {
+      "field": "__CATEGORICAL_X__",
+      "type": "nominal",
+      "title": "__CATEGORICAL_X_TITLE__",
+      "axis": {
+        "labelAngle": -30,
+        "labelFontSize": 11,
+        "labelColor": "#6b7280",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "grid": false
+      }
+    },
+    "xOffset": {
+      "field": "__CATEGORICAL_COLOR__",
+      "type": "nominal"
+    },
+    "y": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "title": "__NUMERIC_TITLE__",
+      "axis": {
+        "labelFontSize": 11,
+        "labelColor": "#9ca3af",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "titleFontWeight": 500,
+        "titlePadding": 12,
+        "domain": false,
+        "ticks": false,
+        "gridColor": "#f3f4f6",
+        "gridOpacity": 0.8,
+        "gridDash": [3, 3],
+        "format": ",.0f"
+      }
+    },
+    "color": {
+      "field": "__CATEGORICAL_COLOR__",
+      "type": "nominal",
+      "scale": {
+        "range": [
+          "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+          "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal",
+        "columns": 4,
+        "labelFontSize": 11,
+        "labelColor": "#4b5563",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "symbolSize": 100,
+        "symbolType": "square",
+        "symbolStrokeWidth": 0,
+        "offset": 14,
+        "title": "__CATEGORICAL_COLOR_TITLE__"
+      }
+    },
+    "tooltip": [
+      {"field": "__CATEGORICAL_X__", "type": "nominal", "title": "__CATEGORICAL_X_TITLE__"},
+      {"field": "__CATEGORICAL_COLOR__", "type": "nominal", "title": "__CATEGORICAL_COLOR_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "start",
+      "offset": 14
+    }
+  }
+}

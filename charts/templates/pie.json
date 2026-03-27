@@ -1,0 +1,61 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Pie chart — clean slices, white borders, no axis lines",
+  "width": 400,
+  "height": 400,
+  "padding": {"left": 20, "right": 20, "top": 20, "bottom": 20},
+  "data": {"values": "__DATA__"},
+  "mark": {
+    "type": "arc",
+    "innerRadius": 0,
+    "outerRadius": 150,
+    "stroke": "#ffffff",
+    "strokeWidth": 2.5,
+    "cursor": "pointer",
+    "opacity": 0.92
+  },
+  "encoding": {
+    "theta": {
+      "field": "__NUMERIC__",
+      "type": "quantitative",
+      "stack": true
+    },
+    "color": {
+      "field": "__CATEGORICAL__",
+      "type": "nominal",
+      "scale": {
+        "range": [
+          "#6366f1", "#f59e0b", "#10b981", "#ef4444",
+          "#8b5cf6", "#ec4899", "#06b6d4", "#f97316"
+        ]
+      },
+      "legend": {
+        "orient": "right",
+        "labelFontSize": 11,
+        "labelColor": "#4b5563",
+        "titleFontSize": 12,
+        "titleColor": "#374151",
+        "symbolSize": 120,
+        "symbolType": "circle",
+        "offset": 16,
+        "title": "__CATEGORICAL_TITLE__"
+      }
+    },
+    "tooltip": [
+      {"field": "__CATEGORICAL__", "type": "nominal", "title": "__CATEGORICAL_TITLE__"},
+      {"field": "__NUMERIC__", "type": "quantitative", "format": ",.2f", "title": "__NUMERIC_TITLE__"}
+    ]
+  },
+  "config": {
+    "background": "#ffffff",
+    "font": "Inter, Segoe UI, Roboto, sans-serif",
+    "view": {"stroke": "transparent"},
+    "title": {
+      "fontSize": 16,
+      "fontWeight": 600,
+      "color": "#1a1a2e",
+      "anchor": "middle",
+      "offset": 14
+    }
+  }
+}

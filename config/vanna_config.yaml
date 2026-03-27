@@ -1,0 +1,18 @@
+# config/vanna_config.yaml
+# Ollama LLM + ChromaDB vector store configuration for Vanna.
+
+# Ollama settings
+model: "qwen3.5:9b"
+ollama_host: "http://localhost:11434"
+
+# ChromaDB persistence path (relative to project root)
+chromadb_path: "./vectordb"
+
+# RAG retrieval settings (used by Vanna internally)
+# Increasing n_results returns more context but costs more tokens.
+n_results_sql: 10
+n_results_ddl: 5
+n_results_documentation: 5
+
+# Training thresholds
+min_training_examples_warning: 20

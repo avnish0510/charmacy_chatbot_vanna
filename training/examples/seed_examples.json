@@ -1,0 +1,82 @@
+[
+  {
+    "question": "What is the total revenue?",
+    "sql": "SELECT SUM(MRP) AS total_revenue FROM [dbo].[B2B_B2C] WHERE NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled'))"
+  },
+  {
+    "question": "What is the total revenue by platform?",
+    "sql": "SELECT platform, SUM(MRP) AS revenue, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY platform ORDER BY revenue DESC"
+  },
+  {
+    "question": "Show monthly revenue trend",
+    "sql": "SELECT month_year, SUM(MRP) AS revenue, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE month_year IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY month_year ORDER BY MIN(order_date)"
+  },
+  {
+    "question": "Top 10 products by revenue",
+    "sql": "SELECT TOP 10 product_name, article_type, SUM(quantity) AS units, SUM(MRP) AS revenue FROM [dbo].[B2B_B2C] WHERE product_name IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY product_name, article_type ORDER BY revenue DESC"
+  },
+  {
+    "question": "What is the total number of units sold?",
+    "sql": "SELECT SUM(CASE WHEN platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement') THEN 0 WHEN platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO') THEN 0 WHEN platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled' THEN 0 ELSE quantity END) AS total_units FROM [dbo].[B2B_B2C]"
+  },
+  {
+    "question": "What is the average selling price?",
+    "sql": "SELECT SUM(MRP) / NULLIF(SUM(quantity), 0) AS asp FROM [dbo].[B2B_B2C] WHERE NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled'))"
+  },
+  {
+    "question": "Revenue by article type",
+    "sql": "SELECT article_type, SUM(MRP) AS revenue, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE article_type IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY article_type ORDER BY revenue DESC"
+  },
+  {
+    "question": "What is the cancellation rate?",
+    "sql": "SELECT CAST(SUM(CASE WHEN (platform='Amazon' AND transaction_type='Cancel') OR (platform='Flipkart' AND event_sub_type='Cancellation') THEN 1 ELSE 0 END) AS FLOAT) / NULLIF(COUNT(*), 0) * 100 AS cancel_rate FROM [dbo].[B2B_B2C]"
+  },
+  {
+    "question": "Revenue by state",
+    "sql": "SELECT ship_to_state, SUM(MRP) AS revenue FROM [dbo].[B2B_B2C] WHERE ship_to_state IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY ship_to_state ORDER BY revenue DESC"
+  },
+  {
+    "question": "Compare B2B vs B2C revenue",
+    "sql": "SELECT ordertype, SUM(MRP) AS revenue, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY ordertype ORDER BY revenue DESC"
+  },
+  {
+    "question": "Top 5 states by number of orders",
+    "sql": "SELECT TOP 5 ship_to_state, COUNT(DISTINCT CASE WHEN platform IN ('Amazon','Flipkart','Myntra') THEN order_id END) + COUNT(CASE WHEN platform IN ('Shopify','Zepto') THEN 1 END) AS total_orders FROM [dbo].[B2B_B2C] WHERE ship_to_state IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY ship_to_state ORDER BY total_orders DESC"
+  },
+  {
+    "question": "Average order value for Amazon",
+    "sql": "SELECT SUM(MRP) / NULLIF(COUNT(DISTINCT order_id), 0) AS aov FROM [dbo].[B2B_B2C] WHERE platform = 'Amazon' AND NOT (ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement'))"
+  },
+  {
+    "question": "Monthly revenue trend for Flipkart",
+    "sql": "SELECT month_year, SUM(MRP) AS revenue FROM [dbo].[B2B_B2C] WHERE platform = 'Flipkart' AND month_year IS NOT NULL AND NOT (ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) GROUP BY month_year ORDER BY MIN(order_date)"
+  },
+  {
+    "question": "Nykaa discount percentage",
+    "sql": "SELECT (SUM(display_price) - SUM(selling_price)) / NULLIF(SUM(display_price), 0) * 100 AS discount_pct FROM [dbo].[B2B_B2C] WHERE platform = 'Nykaa'"
+  },
+  {
+    "question": "Revenue by payment method",
+    "sql": "SELECT payment_method, SUM(MRP) AS revenue FROM [dbo].[B2B_B2C] WHERE payment_method IS NOT NULL AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY payment_method ORDER BY revenue DESC"
+  },
+  {
+    "question": "How many products do we sell?",
+    "sql": "SELECT COUNT(DISTINCT product_name) AS product_count FROM [dbo].[B2B_B2C] WHERE product_name IS NOT NULL"
+  },
+  {
+    "question": "Primary vs Secondary revenue",
+    "sql": "SELECT salestype, SUM(MRP) AS revenue FROM [dbo].[B2B_B2C] WHERE NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY salestype ORDER BY revenue DESC"
+  },
+  {
+    "question": "Top 10 products by units sold on Amazon",
+    "sql": "SELECT TOP 10 product_name, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE platform = 'Amazon' AND product_name IS NOT NULL AND NOT (ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) GROUP BY product_name ORDER BY units DESC"
+  },
+  {
+    "question": "Revenue from Foundation products",
+    "sql": "SELECT product_name, SUM(MRP) AS revenue, SUM(quantity) AS units FROM [dbo].[B2B_B2C] WHERE article_type = 'Foundation' AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled')) GROUP BY product_name ORDER BY revenue DESC"
+  },
+  {
+    "question": "How many orders from Maharashtra?",
+    "sql": "SELECT COUNT(DISTINCT CASE WHEN platform IN ('Amazon','Flipkart','Myntra') THEN order_id END) + COUNT(CASE WHEN platform IN ('Shopify','Zepto') THEN 1 END) AS total_orders FROM [dbo].[B2B_B2C] WHERE ship_to_state IN ('Maharashtra','Mh') AND NOT ((platform = 'Amazon' AND ISNULL(transaction_type,'') IN ('Cancel','Refund','FreeReplacement')) OR (platform = 'Flipkart' AND ISNULL(event_sub_type,'') IN ('Cancellation','Return','RTO')) OR (platform = 'Shopify' AND ISNULL(fulfilment_type,'') = 'unfulfilled'))"
+  }
+]
