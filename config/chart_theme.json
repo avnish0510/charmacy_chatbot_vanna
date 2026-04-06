@@ -79,9 +79,12 @@
       "opacity": 0.8
     },
     "text": {
+      "font": "Inter, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif",
       "fontSize": 11,
-      "color": "#374151"
+      "fontWeight": 700,
+      "color": "#334155"
     },
+
     "range": {
       "category": [
         "#6366f1",

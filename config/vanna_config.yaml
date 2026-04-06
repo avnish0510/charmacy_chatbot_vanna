@@ -1,8 +1,12 @@
 # config/vanna_config.yaml
+
 # Ollama LLM + ChromaDB vector store configuration for Vanna.
 
 # Ollama settings
-model: "qwen3.5:9b"
+
+model: "qwen3.5:9b" 
+summary_model: "qwen2.5:3b" 
+think: false
 ollama_host: "http://localhost:11434"
 
 # ChromaDB persistence path (relative to project root)

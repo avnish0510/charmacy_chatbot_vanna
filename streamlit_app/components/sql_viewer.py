@@ -26,6 +26,7 @@ def render_sql_viewer(
     expanded: bool = False,
     original_sql: Optional[str] = None,
     auto_fixed: bool = False,
+    key_suffix: str = "",
 ) -> None:
     """
     Display SQL in a collapsible expander with syntax highlighting.
@@ -64,9 +65,17 @@ def render_sql_viewer(
         # Copy button (Streamlit's code block has built-in copy,
         # but we add a manual option for older versions)
         col1, col2 = st.columns([6, 1])
+        copy_key = (
+            f"copy_sql_{hash(sql)}_{key_suffix}"
+            if key_suffix else
+            f"copy_sql_{hash(sql)}"
+        )
         with col2:
-            if st.button("📋", key=f"copy_sql_{hash(sql)}", help="Copy SQL"):
+            if st.button("📋", key=copy_key, help="Copy SQL"):
                 st.toast("SQL copied to clipboard area above ☝️")
+        # with col2:
+        #     if st.button("📋", key=f"copy_sql_{hash(sql)}", help="Copy SQL"):
+        #         st.toast("SQL copied to clipboard area above ☝️")
 
 
 def render_sql_error(

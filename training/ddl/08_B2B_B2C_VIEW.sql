@@ -363,7 +363,7 @@ SELECT
 FROM Zepto_B2B_Secondary_Daily z
 LEFT JOIN EAN_Master e ON z.ean = e.[Zepto - EAN]
 
-UNION ALL
+UNION ALL 
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- SEGMENT 7: AMAZON B2B (BUSINESS)

@@ -108,6 +108,7 @@ def render_data_table(
     show_download: bool = True,
     compact: bool = False,
     use_container_width: bool = True,
+    key_suffix: str = "",
 ) -> None:
     """
     Render a pandas DataFrame as a formatted Streamlit table.
@@ -169,12 +170,19 @@ def render_data_table(
         df.to_csv(csv_buffer, index=False, encoding="utf-8")
         csv_bytes = csv_buffer.getvalue()
 
+        download_key = (
+            f"download_{hash(str(df.columns.tolist()))}_{len(df)}_{key_suffix}"
+            if key_suffix else
+            f"download_{hash(str(df.columns.tolist()))}_{len(df)}"
+        )
+
         st.download_button(
             label="📥 Download CSV",
             data=csv_bytes,
             file_name="query_results.csv",
             mime="text/csv",
-            key=f"download_{hash(str(df.columns.tolist()))}_{len(df)}",
+            # key=f"download_{hash(str(df.columns.tolist()))}_{len(df)}",
+            key=download_key,
         )
 
 

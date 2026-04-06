@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 def _vl_base(
     title: str = "",
-    width: int = 600,
+    width: int = 680,
     height: int = 380,
 ) -> Dict[str, Any]:
     """Return a base Vega-Lite spec dict."""
@@ -68,6 +68,169 @@ def _auto_title(chart_type: str, cols: List[str]) -> str:
     if not readable:
         return chart_type.replace("_", " ").title()
     return " vs ".join(readable[:3])
+
+
+
+def _is_percent_like(field: str) -> bool:
+    field = field.lower()
+    return any(token in field for token in ("pct", "percent", "rate", "share"))
+
+
+def _vega_label_expr(field: str) -> str:
+    value = f"datum['{field}']"
+    if _is_percent_like(field):
+        return f"format({value}, '.1f') + '%'"
+    return (
+        f"abs({value}) >= 10000000 ? format({value}/1000000, '.0f') + 'M' : "
+        f"abs({value}) >= 1000000 ? format({value}/1000000, '.1f') + 'M' : "
+        f"abs({value}) >= 1000 ? format({value}/1000, '.1f') + 'K' : "
+        f"format({value}, ',.0f')"
+    )
+
+
+def _text_mark(
+    *,
+    dx: int = 0,
+    dy: int = 0,
+    align: str = "center",
+    baseline: str = "middle",
+    color: str = "#334155",
+) -> Dict[str, Any]:
+    return {
+        "type": "text",
+        "font": "Inter",
+        "fontSize": 11,
+        "fontWeight": "bold",
+        "color": color,
+        "dx": dx,
+        "dy": dy,
+        "align": align,
+        "baseline": baseline,
+    }
+
+
+def _layer_from_top_level(
+    spec: Dict[str, Any],
+    label_layer: Dict[str, Any],
+) -> Dict[str, Any]:
+    base_mark = spec.pop("mark", None)
+    base_encoding = spec.pop("encoding", None)
+    base_transform = spec.pop("transform", None)
+
+    base_layer: Dict[str, Any] = {}
+    if base_mark is not None:
+        base_layer["mark"] = base_mark
+    if base_encoding is not None:
+        base_layer["encoding"] = base_encoding
+    if base_transform is not None:
+        base_layer["transform"] = base_transform
+
+    spec["layer"] = [base_layer, label_layer]
+    return spec
+
+
+def _add_data_labels(
+    spec: Dict[str, Any],
+    df: pd.DataFrame,
+    shape: DataShape,
+    chart_type: str,
+) -> Dict[str, Any]:
+    if df is None or df.empty:
+        return spec
+    if "mark" not in spec or "encoding" not in spec:
+        return spec
+
+    encoding = spec["encoding"]
+
+    if chart_type == "bar_vertical":
+        if len(df) > 12:
+            return spec
+        num = _safe_col(shape, "numeric") or df.columns[-1]
+        label_layer = {
+            "transform": [{"calculate": _vega_label_expr(num), "as": "__label"}],
+            "mark": _text_mark(dy=-8, baseline="bottom"),
+            "encoding": {
+                "x": encoding["x"],
+                "y": encoding["y"],
+                "text": {"field": "__label", "type": "nominal"},
+            },
+        }
+        return _layer_from_top_level(spec, label_layer)
+
+    if chart_type == "bar_horizontal":
+        if len(df) > 15:
+            return spec
+        num = _safe_col(shape, "numeric") or df.columns[-1]
+        label_layer = {
+            "transform": [{"calculate": _vega_label_expr(num), "as": "__label"}],
+            "mark": _text_mark(dx=8, align="left"),
+            "encoding": {
+                "x": encoding["x"],
+                "y": encoding["y"],
+                "text": {"field": "__label", "type": "nominal"},
+            },
+        }
+        return _layer_from_top_level(spec, label_layer)
+
+    if chart_type == "grouped_bar":
+        if len(df) > 18:
+            return spec
+        num = _safe_col(shape, "numeric") or df.columns[-1]
+        label_layer = {
+            "transform": [{"calculate": _vega_label_expr(num), "as": "__label"}],
+            "mark": _text_mark(dy=-8, baseline="bottom"),
+            "encoding": {
+                "x": encoding["x"],
+                "xOffset": encoding["xOffset"],
+                "y": encoding["y"],
+                "text": {"field": "__label", "type": "nominal"},
+            },
+        }
+        return _layer_from_top_level(spec, label_layer)
+
+    if chart_type == "line":
+        if len(df) > 10:
+            return spec
+        num = _safe_col(shape, "numeric") or df.columns[-1]
+        label_layer = {
+            "transform": [{"calculate": _vega_label_expr(num), "as": "__label"}],
+            "mark": _text_mark(dy=-10, baseline="bottom"),
+            "encoding": {
+                "x": encoding["x"],
+                "y": encoding["y"],
+                "text": {"field": "__label", "type": "nominal"},
+            },
+        }
+        return _layer_from_top_level(spec, label_layer)
+
+    if chart_type in ("donut", "pie"):
+        if len(df) > 6:
+            return spec
+        cat = _safe_col(shape, "categorical") or df.columns[0]
+        num = _safe_col(shape, "numeric") or df.columns[-1]
+        label_layer = {
+            "transform": [{
+                "calculate": f"datum['{cat}'] + ' | ' + ({_vega_label_expr(num)})",
+                "as": "__label",
+            }],
+            "mark": {
+                "type": "text",
+                "radius": 160,
+                "font": "Inter",
+                "fontSize": 11,
+                "fontWeight": "bold",
+                "color": "#334155",
+            },
+            "encoding": {
+                "theta": encoding["theta"],
+                "detail": {"field": cat, "type": "nominal"},
+                "text": {"field": "__label", "type": "nominal"},
+            },
+        }
+        return _layer_from_top_level(spec, label_layer)
+
+    return spec
+
 
 
 # ── Chart type builders ──────────────────────────────────────────────────────
@@ -225,12 +388,32 @@ def _build_area(df: pd.DataFrame, shape: DataShape) -> Dict[str, Any]:
     return spec
 
 
+# def _build_donut(df: pd.DataFrame, shape: DataShape) -> Dict[str, Any]:
+#     cat = _safe_col(shape, "categorical") or df.columns[0]
+#     num = _safe_col(shape, "numeric") or df.columns[-1]
+#     spec = _vl_base(title=_auto_title("donut", [cat, num]), width=400, height=400)
+#     spec["data"]["values"] = _df_to_records(df)
+#     spec["mark"] = {"type": "arc", "innerRadius": 55}
+#     spec["encoding"] = {
+#         "theta": {"field": num, "type": "quantitative", "stack": True},
+#         "color": {
+#             "field": cat,
+#             "type": "nominal",
+#             "legend": {"title": cat.replace("_", " ").title()},
+#         },
+#         "tooltip": [
+#             {"field": cat, "type": "nominal"},
+#             {"field": num, "type": "quantitative", "format": ",.2f"},
+#         ],
+#     }
+#     return spec
+
 def _build_donut(df: pd.DataFrame, shape: DataShape) -> Dict[str, Any]:
     cat = _safe_col(shape, "categorical") or df.columns[0]
     num = _safe_col(shape, "numeric") or df.columns[-1]
-    spec = _vl_base(title=_auto_title("donut", [cat, num]), width=400, height=400)
+    spec = _vl_base(title=_auto_title("donut", [cat, num]), width=460, height=420)
     spec["data"]["values"] = _df_to_records(df)
-    spec["mark"] = {"type": "arc", "innerRadius": 55}
+    spec["mark"] = {"type": "arc", "innerRadius": 70, "outerRadius": 128}
     spec["encoding"] = {
         "theta": {"field": num, "type": "quantitative", "stack": True},
         "color": {
@@ -244,7 +427,6 @@ def _build_donut(df: pd.DataFrame, shape: DataShape) -> Dict[str, Any]:
         ],
     }
     return spec
-
 
 def _build_scatter(df: pd.DataFrame, shape: DataShape) -> Dict[str, Any]:
     num_x = shape.numeric_cols[0] if len(shape.numeric_cols) > 0 else df.columns[0]
@@ -523,8 +705,15 @@ def generate_chart_spec(
         spec = _build_table(df, shape)
 
     # Apply theme (skip for table placeholders)
+    # if chart_type != "table":
+    #     spec = apply_theme(spec)
+
+    # Add stylish data labels before theme so themed text settings apply
     if chart_type != "table":
+        spec = _add_data_labels(spec, df, shape, chart_type)
         spec = apply_theme(spec)
+
+
 
     logger.debug("Generated Vega-Lite spec for chart_type='%s'.", chart_type)
     return spec
